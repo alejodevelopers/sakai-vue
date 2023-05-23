@@ -8,6 +8,7 @@ const router = createRouter({
             path: '/',
             component: AppLayout,
             children: [
+
                 {
                     path: '/',
                     name: 'dashboard',
@@ -92,6 +93,16 @@ const router = createRouter({
                     ]
                 },
                 {
+                    path: '/users',
+                    name: 'users',
+                    component: () => import('@/views/users/Users.vue')
+                },
+                {
+                    path: '/music',
+                    name: 'music',
+                    component: () => import('@/views/music/Music.vue')
+                },
+                {
                     path: '/uikit/message',
                     name: 'message',
                     component: () => import('@/views/uikit/Messages.vue')
@@ -154,6 +165,12 @@ const router = createRouter({
             component: () => import('@/views/pages/NotFound.vue')
         },
 
+        
+        {
+            path: '/auth/login',
+            name: 'login',
+            component: () => import('@/views/pages/auth/Login.vue')
+        },
         {
             path: '/auth/login',
             name: 'login',

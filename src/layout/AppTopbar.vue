@@ -62,9 +62,8 @@ const isOutsideClicked = (event) => {
 
 <template>
     <div class="layout-topbar">
-        <router-link to="/" class="layout-topbar-logo">
-            <img :src="logoUrl" alt="logo" />
-            <span>SAKAI</span>
+        <router-link to="/" class="logo-header">
+            <img src="/public/img/logo-business.png" width="170" healt="logo" />
         </router-link>
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
@@ -92,4 +91,11 @@ const isOutsideClicked = (event) => {
     </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.logo-header{
+    width: 180px;
+    height: auto;
+
+}
+
+</style>
