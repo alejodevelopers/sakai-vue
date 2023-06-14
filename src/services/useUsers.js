@@ -1,8 +1,20 @@
 import {ref} from 'vue'
-import axios from 'axios'
 import { useToast } from 'primevue/usetoast';
-
+import { useAuthStore } from '../stores/auth';
+import { useApi } from '@/api/useAPI.js'
 const useUsers = () =>{
+    const api = useApi()
+    const authStore = useAuthStore();
+    const userDialog = ref(false);
+    const deleteUserDialog = ref(false);
+    const deleteUsersDialog = ref(false);
+    const selectedUsers = ref(null);
+    const page = ref(1)
+    const paginator =ref(15)
+    const orderBy = ref('desc');
+    const sort = ref('id');
+    const users = ref([])
+    const errors = ref([]);
     const toast = useToast();
     const user = ref({
         name:'',
@@ -11,112 +23,140 @@ const useUsers = () =>{
         cedula:'',
         phone:0,
         password:'',
+        password_confirmation:'',
+        country:'',
+        state:'',
+        city:'',
         address:'',
+        latitude:'',
+        longitude:'',
+        location:'',
+        neighborhood:''
     });
-    const users = ref([])
-    const errors = ref([]);
-    const register = async()=>{
-        const options = {
-            method: 'POST',
-            url: 'http://api-quasar.test/api/users',
-            headers: {Accept: 'application/json'},
-            data: {
-                name:user.value.name,
-                email:user.value.email,
-                cedula:user.value.cedula,
-                phone:user.value.phone,
-                password:user.value.password,
-                address:user.value.address,
-                password:user.value.password.confirmation
-            }
+    const meta = ref({
+        current_page: 1,
+        from: 1,
+        last_page: 3,
+        links: [],
+        path: "/api/users",
+        per_page: 50,
+        to: 50,
+        total: 101
+    })
+ 
+
+    const onPage = (event) => {
+        const pg = 1 + event.page
+        page.value = pg
+        paginator.value = event.rows
+        return getData();  
+    };
+    const onSort = (event) => {
+        if(event.sortOrder=== 1){
+            orderBy.value = 'asc'
+        }else{
+            orderBy.value = 'desc'
         }
-        try {
-            const {data}= await axios.request(options);
+        sort.value = event.sortField
+        getData();
+    };
+    const onFilter = (event) => {
+    };
+
+    const create = async() => {
+       try {
+        const {data} = await api.post("/users",user.value)
+
             if(data){
-                toast.add({ severity: 'success', summary: 'Successful', detail: 'User Created', life: 3000 });
-            }else{
-                toast.add({ severity: 'warning', summary: 'Successful', detail: 'Error', life: 3000 });
+                userDialog.value = false;
+                user.value = data.data;
+                toast.add({ severity: 'success', summary: 'Successful', detail: data.msg, life: 5000 });
+                getData();
             }
-            console.log(data);
+
         } catch (error) {
             if(error.response.status === 422){
-                errors.value =error.response.data.errors;
-                user.value;
+                errors.value = error.response.data.errors;
             }
-   
-            console.log(error);
         }
     }
-    const create = async()=>{
-        const options = {
-            method: 'POST',
-            url: 'http://api-quasar.test/api/users/create',
-            headers: {Accept: 'application/json'},
-            data: {
-                name:user.value.name,
-                email:user.value.email,
-                cedula:user.value.cedula,
-                phone:user.value.phone,
-                password:user.value.password,
-                address:user.value.address,
-            }
-        }
-        try {
-            const {data}= await axios.request(options);
+    const update = async(id) => {
+       try {
+        const {data} = await api.put(`/users/${id}`,user.value)
+
             if(data){
-                toast.add({ severity: 'success', summary: 'Successful', detail: 'User Created', life: 3000 });
-            }else{
-                toast.add({ severity: 'warning', summary: 'Successful', detail: 'Error', life: 3000 });
+                userDialog.value = false;
+                user.value = data.data
+                toast.add({ severity: 'success', summary: 'Successful', detail: data.msg, life: 5000 });
+                getData();
             }
-            console.log(data);
         } catch (error) {
+ 
             if(error.response.status === 422){
-                errors.value =error.response.data.errors;
-                user.value;
+                errors.value = error.response.data.errors;
             }
-   
-            console.log(error);
         }
     }
 
     const getData = async()=>{
-        const options = {
-            method: 'GET',
-            url: 'http://api-quasar.test/api/users',
-            headers: {Accept: 'application/json'},
-        }
+       
         try {
-            const {data}= await axios.request(options);
-            users.value = data.data;
-        
+            const {data}= await api.get('/users',{
+                params:{
+                    page:page.value,
+                    paginator: paginator.value,
+                    orderBy:orderBy.value,
+                    sort:sort.value
+                }
+            })
+            meta.value = data.meta;
+            users.value = data.data            
+        } catch (error) {
+            
+        }
+
+    }
+    const profile = async()=>{
+       
+        try {
+            const {data}= await api.get('/profile')
+            if(data){
+                user.value = data;
+            }
         } catch (error) {
             console.log(error);
         }
+
     }
     const deleteUser = async(id)=>{
-        const options = {
-            method: 'DELETE',
-            url: `http://api-quasar.test/api/users/${id}`,
-            headers: {Accept: 'application/json'},
-        }
-        try {
-            const {data}= await axios.request(options);
-            user.value = data;
-        
-        } catch (error) {
-            console.log(error);
+        try{
+            const {data }= api.delete(`/users/${id}`);
+            console.log(data.data);
+        }catch(error){
+
         }
     }
 
-    getData();
+ 
+
 
     return {
-        register,
-        user,
-        errors,
         getData,
+        user,
+        profile,
+        meta,
+        errors,
+        create,
+        users,
         deleteUser,
-        users
+        selectedUsers,
+        deleteUsersDialog,
+        deleteUserDialog,
+        userDialog,
+        onFilter,
+        onPage,
+        update,
+        onSort
     }
 }
 

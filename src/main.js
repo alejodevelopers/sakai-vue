@@ -1,6 +1,8 @@
-import { createApp } from 'vue';
+import { createApp,markRaw } from 'vue';
 import App from './App.vue';
 import router from './router';
+import {createPinia} from 'pinia';
+import './axios'
 
 import PrimeVue from 'primevue/config';
 import AutoComplete from 'primevue/autocomplete';
@@ -103,11 +105,18 @@ import VirtualScroller from 'primevue/virtualscroller';
 import CodeHighlight from '@/components/CodeHighlight.vue';
 import BlockViewer from '@/components/BlockViewer.vue';
 
+
 import '@/assets/styles.scss';
 
 const app = createApp(App);
 
+const pinia = createPinia();
+
+
+
+
 app.use(router);
+app.use(pinia);
 app.use(PrimeVue, { ripple: true });
 app.use(ToastService);
 app.use(DialogService);
@@ -210,5 +219,9 @@ app.component('TreeSelect', TreeSelect);
 app.component('TreeTable', TreeTable);
 app.component('TriStateCheckbox', TriStateCheckbox);
 app.component('VirtualScroller', VirtualScroller);
+
+pinia.use(({store})=>{
+    store.router = markRaw(router)
+})
 
 app.mount('#app');

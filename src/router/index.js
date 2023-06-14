@@ -1,23 +1,33 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
+import authMiddleware from './middleware/auth-middleware'
+
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes: [
         {
             path: '/',
             component: AppLayout,
             children: [
-
                 {
                     path: '/',
                     name: 'dashboard',
+                    meta:{
+                        auth: true,
+                    },
                     component: () => import('@/views/Dashboard.vue')
                 },
                 {
-                    path: '/uikit/formlayout',
-                    name: 'formlayout',
-                    component: () => import('@/views/uikit/FormLayout.vue')
+                    path: '/profile',
+                    name: 'profile',
+                    
+                    component: () => import('@/views/pages/auth/Profile.vue')
+                },
+                {
+                    path: '/music/',
+                    name: 'play',
+                    component: () => import('@/views/music/Music.vue')
                 },
                 {
                     path: '/uikit/input',
@@ -167,20 +177,19 @@ const router = createRouter({
 
         
         {
-            path: '/auth/login',
+            path: '/login',
             name: 'login',
+        
             component: () => import('@/views/pages/auth/Login.vue')
         },
+      
         {
-            path: '/auth/login',
-            name: 'login',
-            component: () => import('@/views/pages/auth/Login.vue')
-        },
-        {
-            path: '/auth/register',
+            path: '/register',
             name: 'register',
+            
             component: () => import('@/views/pages/auth/Register.vue')
         },
+       
         {
             path: '/auth/access',
             name: 'accessDenied',
@@ -193,5 +202,5 @@ const router = createRouter({
         }
     ]
 });
-
+router.beforeEach(authMiddleware)
 export default router;
