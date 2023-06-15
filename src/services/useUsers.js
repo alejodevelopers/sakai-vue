@@ -13,6 +13,7 @@ const useUsers = () =>{
     const paginator =ref(15)
     const orderBy = ref('desc');
     const sort = ref('id');
+    const photo = ref();
     const users = ref([])
     const errors = ref([]);
     const toast = useToast();
@@ -20,6 +21,7 @@ const useUsers = () =>{
         name:'',
         email:'',
         username:'',
+        profile_picture:'',
         cedula:'',
         phone:0,
         password:'',
@@ -82,8 +84,8 @@ const useUsers = () =>{
     }
     const update = async(id) => {
        try {
-        const {data} = await api.put(`/users/${id}`,user.value)
-
+        console.log(user.value);
+        const {data} = await api.put(`/users/${id}`, user.value);
             if(data){
                 userDialog.value = false;
                 user.value = data.data
@@ -91,7 +93,7 @@ const useUsers = () =>{
                 getData();
             }
         } catch (error) {
- 
+          console.log(error);
             if(error.response.status === 422){
                 errors.value = error.response.data.errors;
             }
@@ -121,7 +123,9 @@ const useUsers = () =>{
         try {
             const {data}= await api.get('/profile')
             if(data){
-                user.value = data;
+                user.value = data.data;
+                photo.value = data.profile_picture;
+               
             }
         } catch (error) {
             console.log(error);
@@ -137,15 +141,13 @@ const useUsers = () =>{
         }
     }
 
- 
-
-
     return {
         getData,
         user,
         profile,
         meta,
         errors,
+        photo,
         create,
         users,
         deleteUser,
