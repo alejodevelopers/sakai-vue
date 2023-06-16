@@ -4,7 +4,6 @@ import { useAuthStore } from '../stores/auth';
 import { useApi } from '@/api/useAPI.js'
 const useUsers = () =>{
     const api = useApi()
-    const authStore = useAuthStore();
     const userDialog = ref(false);
     const deleteUserDialog = ref(false);
     const deleteUsersDialog = ref(false);
@@ -21,7 +20,7 @@ const useUsers = () =>{
         name:'',
         email:'',
         username:'',
-        profile_picture:'',
+        picture:'',
         cedula:'',
         phone:0,
         password:'',
@@ -84,8 +83,8 @@ const useUsers = () =>{
     }
     const update = async(id) => {
        try {
-        console.log(user.value);
-        const {data} = await api.put(`/users/${id}`, user.value);
+        const {data} = await api.put(`users/${id}`, user.value);
+
             if(data){
                 userDialog.value = false;
                 user.value = data.data
@@ -93,7 +92,7 @@ const useUsers = () =>{
                 getData();
             }
         } catch (error) {
-          console.log(error);
+            console.log(error);
             if(error.response.status === 422){
                 errors.value = error.response.data.errors;
             }
@@ -124,8 +123,7 @@ const useUsers = () =>{
             const {data}= await api.get('/profile')
             if(data){
                 user.value = data.data;
-                photo.value = data.profile_picture;
-               
+                photo.value = data.picture;               
             }
         } catch (error) {
             console.log(error);
@@ -135,9 +133,8 @@ const useUsers = () =>{
     const deleteUser = async(id)=>{
         try{
             const {data }= api.delete(`/users/${id}`);
-            console.log(data.data);
         }catch(error){
-
+            console.log(error);
         }
     }
 

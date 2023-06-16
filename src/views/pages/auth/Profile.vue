@@ -1,7 +1,7 @@
 <script setup>
 name: 'profile';
 import useUsers from '@/services/useUsers';
-import { onMounted, watchEffect,ref } from 'vue';
+import { onMounted, watchEffect, ref } from 'vue';
 const { profile, user, update, errors, photo } = useUsers();
 import useCountries from '@/services/useCountries';
 import { usePrimeVue } from 'primevue/config';
@@ -26,13 +26,19 @@ const onLocation = () => {
         .catch((e) => {});
 };
 const onUpload = (event) => {
-    let data = new FormData();
     let file = event.target.files[0];
-    data.append('name', 'my-file');
-    data.append('file', file);
-    user.value.profile_picture = file;
-    urlObject.value = URL.createObjectURL(file)
+    user.value.picture = file;
+    getImage(file);
 };
+
+const getImage = (file) => {
+    let reader = new FileReader();
+    reader.onload =(e)=>{
+        urlObject.value = e.target.result;
+    }
+    reader.readAsDataURL(file);
+};
+
 watchEffect(() => {
     if (user.value.country) {
         getStates(user.value.country);
@@ -61,7 +67,7 @@ onMounted(() => {
                         <img v-else alt="user header" src="https://cdn.pixabay.com/photo/2014/11/29/19/33/bald-eagle-550804_1280.jpg" class="avatar my-4" />
                     </div>
                     <div class="flex justify-content-center mb-4">
-                        <input id="src-file" type="file" @change="onUpload" accept="image/*" class="file-select" />
+                        <input id="src-file" type="file" @change="onUpload" :v-model="user.picture" accept="image/*" class="file-select" />
                     </div>
                 </template>
                 <template #title> <strong class="flex justify-content-center mt-4">Manage Profile </strong> </template>
