@@ -3,7 +3,7 @@ import AppLayout from "@/layout/AppLayout.vue";
 import authMiddleware from "./middleware/auth-middleware";
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(/* import.meta.env.BASE_URL */),
   routes: [
     {
       path: "/",
@@ -23,11 +23,7 @@ const router = createRouter({
 
           component: () => import("@/views/pages/auth/Profile.vue")
         },
-        {
-          path: "/music/",
-          name: "play",
-          component: () => import("@/views/music/Music.vue")
-        },
+    
         {
           path: "/uikit/input",
           name: "input",
@@ -177,14 +173,12 @@ const router = createRouter({
     {
       path: "/login",
       name: "login",
-
       component: () => import("@/views/pages/auth/Login.vue")
     },
 
     {
       path: "/register",
       name: "register",
-
       component: () => import("@/views/pages/auth/Register.vue")
     },
 

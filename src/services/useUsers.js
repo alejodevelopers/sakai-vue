@@ -83,10 +83,55 @@ const useUsers = () => {
       }
     }
   };
+  const postImage = async e => {
+    try {
+      const { data } = await api.post(
+        "image",
+        { image: e },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+      if (data) {
+        user.value.picture = data;
+      }
+    } catch (error) {
+      if (error.response.status === 422) {
+        errors.value = error.response.data.errors;
+      }
+    }
+  };
   const update = async id => {
     try {
-      const { data } = await api.put(`users/${id}`, user.value);
-
+      const { data } = await api.post(
+        `users/${id}`,
+        {
+          _method: "PUT",
+          name: user.value.name,
+          email: user.value.email,
+          username: user.value.username,
+          picture: user.value.picture,
+          cedula: user.value.cedula,
+          phone: user.value.phone,
+          password: user.value.password,
+          password_confirmation: user.value.password_confirmation,
+          country: user.value.country,
+          state: user.value.state,
+          city: user.value.city,
+          address: user.value.address,
+          latitude: user.value.latitude,
+          longitude: user.value.longitude,
+          location: user.value.location,
+          neighborhood: user.value.neighborhood
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
       if (data) {
         userDialog.value = false;
         user.value = data.data;
@@ -143,6 +188,7 @@ const useUsers = () => {
     getData,
     user,
     profile,
+    postImage,
     meta,
     errors,
     photo,
