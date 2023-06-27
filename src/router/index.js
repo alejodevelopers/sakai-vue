@@ -29,7 +29,7 @@ const router = createRouter({
           component: () => import("@/views/companies/Companies.vue")
         },
     
-        {
+       /*  {
           path: "/uikit/input",
           name: "input",
           component: () => import("@/views/uikit/Input.vue")
@@ -101,7 +101,7 @@ const router = createRouter({
               component: () => import("@/views/uikit/menu/ConfirmationDemo.vue")
             }
           ]
-        },
+        }, */
         {
           path: "/users",
           name: "users",
@@ -112,7 +112,7 @@ const router = createRouter({
           name: "music",
           component: () => import("@/views/music/Music.vue")
         },
-        {
+        /* {
           path: "/uikit/message",
           name: "message",
           component: () => import("@/views/uikit/Messages.vue")
@@ -161,7 +161,7 @@ const router = createRouter({
           path: "/documentation",
           name: "documentation",
           component: () => import("@/views/utilities/Documentation.vue")
-        }
+        } */
       ]
     },
     {
