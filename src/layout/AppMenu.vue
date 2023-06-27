@@ -8,7 +8,7 @@ const model = ref([
         label: 'Home',
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
     },
-    {
+    /* {
         label: 'UI Components',
         items: [
             { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
@@ -42,7 +42,7 @@ const model = ref([
             { label: 'PrimeIcons', icon: 'pi pi-fw pi-prime', to: '/utilities/icons' },
             { label: 'PrimeFlex', icon: 'pi pi-fw pi-desktop', url: 'https://www.primefaces.org/primeflex/', target: '_blank' }
         ]
-    },
+    }, */
     {
         label: 'Pages',
         icon: 'pi pi-fw pi-briefcase',
@@ -115,6 +115,19 @@ const model = ref([
         ]
     },
     {
+        label: 'Companies',
+        icon: 'pi pi-fw pi-briefcase',
+        to: '/companies',
+        items: [
+            {
+                label: 'Show Companies',
+                icon: 'pi pi-fw pi-users',
+                to: '/companies'
+            },
+
+        ]
+    },
+    {
         label: 'Hierarchy',
         items: [
             {
@@ -158,7 +171,7 @@ const model = ref([
             }
         ]
     },
-    {
+   /*  {
         label: 'Get Started',
         items: [
             {
@@ -178,7 +191,7 @@ const model = ref([
                 icon: 'pi pi-fw pi-star'
             }
         ]
-    }
+    } */
 ]);
 </script>
 

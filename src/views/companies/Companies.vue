@@ -24,16 +24,23 @@ const {
   onFilter,
   onPage,
   onSort,
+  errors,
 } = useCompanies();
 
 const dt = ref(null);
 const filters = ref({});
 const submitted = ref(false);
-
+const urlObject = ref();
 onBeforeMount(() => {
   initFilters();
   getCountries();
 });
+
+const onUpload = (event) => {
+  let file = event.files[0];
+  urlObject.value = event.files[0].objectURL;
+  company.value.logo = file;
+};
 
 onMounted(() => {
   getData();
@@ -90,7 +97,9 @@ const confirmDeleteCompany = (editCompany) => {
 };
 
 const deleteCompany = () => {
-  companies.value = companies.value.filter((val) => val.id !== company.value.id);
+  companies.value = companies.value.filter(
+    (val) => val.id !== company.value.id
+  );
   deleteCompanyDialog.value = false;
   company.value = {};
   toast.add({
@@ -208,11 +217,11 @@ watchEffect(() => {
           dataKey="id"
           :paginator="true"
           :lazy="true"
-          :rows="meta.per_page"
+          :rows="meta?.per_page"
           :filters="filters"
           scrollable
           scrollHeight="500px"
-          :totalRecords="meta.total"
+          :totalRecords="meta?.total"
           @page="onPage($event)"
           @sort="onSort($event)"
           @filter="onFilter($event)"
@@ -226,7 +235,7 @@ watchEffect(() => {
             default:
               'CurrentPageReport FirstPageLink PrevPageLink PageLinks  NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput',
           }"
-          :currentPageReportTemplate="`Showing ${meta.current_page} to ${meta.last_page} of ${meta.total} companies`"
+          :currentPageReportTemplate="`Showing ${meta?.current_page} to ${meta?.last_page} of ${meta?.total} companies`"
           responsiveLayout="stack"
         >
           <template #header>
@@ -296,83 +305,114 @@ watchEffect(() => {
           :modal="true"
           class="p-fluid"
         >
-          <img
-            :src="'demo/images/company/' + company.image"
-            :alt="company.image"
-            v-if="company.image"
-            width="150"
-            class="mt-0 mx-auto mb-5 block shadow-2"
-          />
-          <div class="field">
-            <label for="name">Name</label>
-            <InputText
-              id="name"
-              v-model.trim="company.name"
-              required="true"
-              autofocus
-              :class="{ 'p-invalid': submitted && !company.name }"
+          <div class="flex justify-content-center">
+            <!--  <img
+              v-if="photo !== 'http://localhost:8000/storage/'"
+              alt="user header"
+              :src="photo"
+              class="avatar my-4"
+            /> -->
+            <img
+              v-if="urlObject"
+              alt="user header"
+              :src="urlObject"
+              class="avatar my-4"
             />
-            <small class="p-invalid" v-if="submitted && !company.name"
-              >Name is required.</small
-            >
+            <img v-else alt="user header" :src="photo" class="avatar my-4" />
           </div>
-          <div class="field">
-            <label for="cedula">Cedula</label>
-            <InputText
-              id="cedula"
-              v-model.trim="company.cedula"
-              required="true"
-              autofocus
-              :class="{ 'p-invalid': submitted && !company.cedula }"
+          <div class="flex justify-content-center mb-4">
+            <FileUpload
+              name="picture"
+              mode="basic"
+              :auto="true"
+              class="mr-2 my-2"
+              :customUpload="true"
+              accept="image/*"
+              :maxFileSize="1000000"
+              type="file"
+              @uploader="onUpload"
             />
-            <small class="p-invalid" v-if="submitted && !company.cedula"
-              >cedula is required.</small
-            >
           </div>
-          <div class="field">
-            <label for="companyname">CompanyName</label>
+          <div class="p-inputgroup flex-1 my-3">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-building"></i>
+            </span>
             <InputText
-              id="companyname"
-              v-model="company.companyname"
-              required="true"
-              autofocues
-              :class="{ 'p-invalid': submitted && !company.companyname }"
+              v-model="company.company_name"
+              :class="{ 'p-invalid': errors.company_name }"
+              placeholder="Company Name"
             />
-            <small class="p-invalid" v-if="submitted && !company.companyname"
-              >companyname is required.</small
-            >
           </div>
-          <div class="field">
-            <label for="email">E-mail</label>
+          <InlineMessage
+            class="w-full justify-content-start"
+            v-if="errors.company_name"
+            >{{ errors.company_name[0] }}</InlineMessage
+          >
+
+          <div class="p-inputgroup flex-1 my-3">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-database"></i>
+            </span>
+            <InputText v-model="company.bank_name" placeholder="Bank Name" />
+          </div>
+          <InlineMessage
+            class="w-full justify-content-start"
+            v-if="errors.bank_name"
+            >{{ errors.bank_name[0] }}</InlineMessage
+          >
+          <div class="p-inputgroup flex-1 my-3">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-hashtag"></i>
+            </span>
             <InputText
-              id="email"
-              type="email"
-              v-model="company.email"
-              required="true"
-              :class="{ 'p-invalid': submitted && !company.email }"
+              v-model="company.account_number"
+              placeholder="Account Number"
             />
-            <small class="p-invalid" v-if="submitted && !company.email"
-              >companyname is required.</small
-            >
           </div>
-          <div class="field">
-            <label for="email">Phone</label>
+          <InlineMessage
+            class="w-full justify-content-start"
+            v-if="errors.account_number"
+            >{{ errors.account_number[0] }}</InlineMessage
+          >
+
+          <div class="p-inputgroup flex-1 my-3">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-wallet"></i>
+            </span>
+            <InputText v-model="company.wallet" placeholder="Wallet" />
+          </div>
+          <InlineMessage
+            class="w-full justify-content-start"
+            v-if="errors.wallet"
+            >{{ errors.wallet[0] }}</InlineMessage
+          >
+
+          <div class="p-inputgroup flex-1 my-3">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-wallet"></i>
+            </span>
             <InputText
-              id="phone"
               type="text"
-              v-model="company.phone"
-              required="true"
-              :class="{ 'p-invalid': submitted && !company.phone }"
+              v-model="company.wallet_crypto"
+              :class="{ 'p-invalid': errors.wallet_crypto }"
+              placeholder="E-mail"
             />
-            <small class="p-invalid" v-if="submitted && !company.phone"
-              >phone is required.</small
-            >
           </div>
-          <div class="field">
-            <label for="country">Country</label>
+          <InlineMessage
+            class="w-full justify-content-start"
+            v-if="errors.wallet_crypto"
+            >{{ errors.wallet_crypto[0] }}</InlineMessage
+          >
+
+          <div class="p-inputgroup flex-1 my-3">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-globe"></i>
+            </span>
             <Dropdown
+              :class="{ 'p-invalid': errors.country }"
               v-model="company.country"
               :options="countries"
+              @change="onLocation"
               optionLabel="name"
               optionValue="name"
               placeholder="Select Country"
@@ -380,11 +420,22 @@ watchEffect(() => {
             >
             </Dropdown>
           </div>
-          <div class="field">
-            <label for="country">State</label>
+          <InlineMessage
+            class="w-full justify-content-start"
+            v-if="errors.country"
+            >{{ errors.country[0] }}</InlineMessage
+          >
+
+          <div class="p-inputgroup flex-1 my-3">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-globe"></i>
+            </span>
+
             <Dropdown
+              :class="{ 'p-invalid': errors.state }"
               v-model="company.state"
               :options="states"
+              @change="onLocation"
               optionLabel="name"
               optionValue="name"
               placeholder="Select State"
@@ -392,45 +443,60 @@ watchEffect(() => {
             >
             </Dropdown>
           </div>
-          <div class="field">
-            <label for="country">City</label>
+          <InlineMessage
+            class="w-full justify-content-start"
+            v-if="errors.state"
+            >{{ errors.state[0] }}</InlineMessage
+          >
+
+          <div class="p-inputgroup flex-1 my-3">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-globe"></i>
+            </span>
             <Dropdown
+              :class="{ 'p-invalid': errors.city }"
               v-model="company.city"
               :options="cities"
               @change="onLocation"
               optionLabel="name"
               optionValue="name"
-              placeholder="Select City"
+              placeholder="Select State"
               class="w-full md:w-14rem"
             >
             </Dropdown>
           </div>
-          <div class="field">
-            <label for="address">Address</label>
+          <InlineMessage
+            class="w-full justify-content-start"
+            v-if="errors.city"
+            >{{ errors.city[0] }}</InlineMessage
+          >
+          <div class="p-inputgroup flex-1 my-3">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-map-marker"></i>
+            </span>
             <InputText
-              id="address"
-              type="text"
               v-model="company.address"
               @change="onLocation"
-              required="true"
-              :class="{ 'p-invalid': submitted && !company.address }"
+              placeholder="Address"
             />
-            <small class="p-invalid" v-if="submitted && !company.address"
-              >address is required.</small
-            >
           </div>
-          <div v-if="company.latitude && company.longitude">
-            <iframe
-              width="100%"
-              height="200px"
-              id="gmap_canvas"
-              :src="`https://maps.google.com/maps?q=${company.latitude},${company.longitude}&t=&z=15&ie=UTF8&iwloc=&output=embed`"
-              frameborder="0"
-              scrolling="no"
-              marginheight="0"
-              marginwidth="0"
-            ></iframe>
-          </div>
+          <InlineMessage
+            class="w-full justify-content-start"
+            v-if="errors.address"
+            >{{ errors.address[0] }}</InlineMessage
+          >
+          <iframe
+            v-if="company.latitude && company.longitude"
+            width="100%"
+            height="500px"
+            id="gmap_canvas"
+            :src="`https://maps.google.com/maps?q=${company.latitude},${company.longitude}&t=&z=15&ie=UTF8&iwloc=&output=embed`"
+            frameborder="0"
+            scrolling="no"
+            marginheight="0"
+            marginwidth="0"
+          ></iframe>
+
           <template #footer>
             <Button
               label="Cancel"
@@ -516,5 +582,38 @@ watchEffect(() => {
 
 <style scoped lang="scss">
 @import "@/assets/demo/styles/badges.scss";
+.avatar {
+  width: 300px;
+  height: 300px;
+  border: 6px solid #11998e;
+  border-radius: 100%;
+}
+
+.file-select {
+  position: relative;
+  display: inline-block;
+}
+
+.file-select::before {
+  background-color: #11998e;
+  color: white;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  content: "Upload Image"; /* testo por defecto */
+  position: absolute;
+  width: 98px;
+  height: 22px;
+}
+.file-select input[type="file"] {
+  opacity: 0;
+  width: 30px;
+  height: 30px;
+  display: none;
+}
+/* #src-file::before {
+  content: 'upload image';
+} */
 </style>
+
 

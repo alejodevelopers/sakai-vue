@@ -23,6 +23,11 @@ const router = createRouter({
 
           component: () => import("@/views/pages/auth/Profile.vue")
         },
+        {
+          path: "/companies",
+          name: "companies",
+          component: () => import("@/views/companies/Companies.vue")
+        },
     
         {
           path: "/uikit/input",
