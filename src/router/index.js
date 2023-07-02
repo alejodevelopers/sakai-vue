@@ -28,8 +28,8 @@ const router = createRouter({
           name: "companies",
           component: () => import("@/views/companies/Companies.vue")
         },
-    
-       /*  {
+
+        /*  {
           path: "/uikit/input",
           name: "input",
           component: () => import("@/views/uikit/Input.vue")
@@ -110,8 +110,8 @@ const router = createRouter({
         {
           path: "/music",
           name: "music",
-          component: () => import("@/views/music/Music.vue")
-        },
+          component: () => import("@/views/music/PlayList.vue")
+        }
         /* {
           path: "/uikit/message",
           name: "message",
