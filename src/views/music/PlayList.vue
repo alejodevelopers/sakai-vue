@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="wrapper">
     <div class="img-area">
       <img :src="currentMusic.image" alt="Music Image" />
@@ -42,7 +42,7 @@ export default {
         name: "Harley Bird - Home",
         artist: "Jordan Schor",
         image: "music-1",
-        source: "music-1",
+        source: "https://www.last.fm/music/Rihanna/_/We+Found+Love+(feat.+Calvin+Harris)",
       },
       {
         name: "Ikson Anywhere – Ikson",
@@ -147,4 +147,61 @@ export default {
     };
   },
 };
+</script> -->
+
+
+<template>
+  <div class="p-d-flex p-ai-center p-flex-column" style="height: 300px;">
+    <div class="p-mb-2">
+      <button class="p-button p-button-text" @click="play">Play</button>
+      <button class="p-button p-button-text" @click="pause">Pause</button>
+      <button class="p-button p-button-text" @click="stop">Stop</button>
+    </div>
+    <div class="p-d-flex p-ai-center p-flex-column">
+      <div class="p-text-bold">{{ currentSong.title }}</div>
+      <div class="p-text-secondary">{{ currentSong.artist }}</div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+
+const currentSong = ref({
+  title: '',
+  artist: '',
+});
+
+const play = () => {
+  // Lógica para reproducir la música
+};
+
+const pause = () => {
+  // Lógica para pausar la música
+};
+
+const stop = () => {
+  // Lógica para detener la música
+};
 </script>
+
+<style scoped>
+.p-d-flex {
+  display: flex;
+}
+.p-ai-center {
+  align-items: center;
+}
+.p-flex-column {
+  flex-direction: column;
+}
+.p-mb-2 {
+  margin-bottom: 2rem;
+}
+.p-text-bold {
+  font-weight: bold;
+}
+.p-text-secondary {
+  color: #999999;
+}
+</style>

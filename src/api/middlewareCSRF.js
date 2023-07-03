@@ -23,7 +23,7 @@ const middlewareCSFR = async axiosconfig => {
   if (isTokenMissing && doesMethodRequireCSRF) {
     // Primero obtenemos el token CSRF
     let pathCSFR = '/sanctum/csrf-cookie'
-    let urlToCall = `${import.meta.env.API_HOST || 'http://tidelit.test'}${pathCSFR}`
+    let urlToCall = `${import.meta.env.API_HOST || 'http://localhost:8000'}${pathCSFR}`
 
     await axios.get(urlToCall, { withCredentials: true })
     // Luego continuamos con la solicitud

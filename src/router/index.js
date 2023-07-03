@@ -110,7 +110,7 @@ const router = createRouter({
         {
           path: "/music",
           name: "music",
-          component: () => import("@/views/music/PlayList.vue")
+          component: () => import("@/components/Music/Search.vue")
         }
         /* {
           path: "/uikit/message",
