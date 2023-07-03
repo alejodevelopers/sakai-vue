@@ -92,7 +92,13 @@
         <span>Songs</span>
       </template>
       <h3 class="my-4 title-music">Songs</h3>
-      <DataTable :value="cues" tableStyle="min-width: 50rem">
+      <DataTable
+        responsiveLayout="stack"
+        breakpoint="960px"
+        showGridlines
+        columnResizeMode="fit | expand"
+        :value="cues"
+      >
         <Column field="title" header="">
           <template #body="slotProps">
             <img :src="slotProps.data.cover_sm" width="80" alt="" />
@@ -115,7 +121,7 @@
             <p>{{ slotProps.data.album }}</p>
           </template>
         </Column>
-        <Column field="duration" header="Time">
+        <Column field="duration" header="">
           <template #body="slotProps">
             <audio ref="audioElement"></audio>
             <Button
