@@ -69,7 +69,6 @@ export const useAuthStore = defineStore({
       localStorage.clear() // siempre limpiar localStorage antes de restablecer el estado
       this.$reset()
       user.$reset()
-
       try {
         await web.post('/logout')
         await router.push({ name: 'login' })

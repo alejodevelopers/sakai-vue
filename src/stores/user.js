@@ -27,6 +27,7 @@ export const useUserStore = defineStore({
     async storeInfo() {
       let { data: userInfo } = await api.get('/user')
       localStorage.setItem('USER_INFO', JSON.stringify(userInfo))
+      console.log(data);
       this.$reset()
     },
   },

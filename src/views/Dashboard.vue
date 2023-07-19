@@ -3,7 +3,8 @@ import { onMounted, reactive, ref, watch } from 'vue';
 import ProductService from '@/services/ProductService';
 import { useLayout } from '@/layout/composables/layout';
 import useUsers from '../services/useUsers';
-import axios from 'axios';
+import { useApi } from '@/api/useAPI.js'
+const api = useApi()
 const { isDarkTheme } = useLayout();
 const { users } = useUsers();
 const products = ref(null);
@@ -36,7 +37,7 @@ const lineOptions = ref(null);
 const productService = new ProductService();
 
 onMounted(async() => {
-   const data = axios.get('/api/user')
+   const data = api.get('user')
    console.log(data);
 });
 

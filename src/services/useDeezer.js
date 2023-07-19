@@ -13,9 +13,9 @@ const useDeezer = () => {
           query: search.value
         }
       });
-      if (data) {
-        console.log(data.tracks);
-        songs.value = data.tracks.items;
+      if (data) {    
+       
+        console.log(songs.value);
       }
     } catch (error) {
       console.log(error);
@@ -38,7 +38,8 @@ const useDeezer = () => {
     try {
       const { data } = await api.get("tracks");
       if (data) {
-        cues.value = data;
+        cues.value = data[0].tracks;
+        console.log(cues.value);
       }
     } catch (error) {
       console.log(error);

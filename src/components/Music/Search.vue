@@ -30,10 +30,10 @@
         <span>All</span>
       </template>
       <h3 class="my-4 title-music">All</h3>
-      <DataTable :value="songs" tableStyle="min-width: 50rem">
+      <DataTable :value="songs" >
         <Column field="url" header="">
           <template #body="slotProps">
-            <img :src="slotProps.data.album.images[2].url" alt="" />
+            <img :src="slotProps.data.images" width="" alt=""  />
           </template>
         </Column>
         <Column field="name" header="Song">
@@ -44,16 +44,16 @@
         <Column field="artist" header="Artist">
           <template #body="slotProps">
             <div class="row">
-              <p>{{ slotProps.data.artists[0].name }}</p>
+              <p>{{ slotProps.data.artist }}</p>
             </div>
           </template>
         </Column>
         <Column field="album" header="Album">
           <template #body="slotProps">
-            <p>{{ slotProps.data.album.name }}</p>
+            <p>{{ slotProps.data.album }}</p>
           </template>
         </Column>
-        <Column field="duration" header="Time">
+        <Column field="duration_ms" header="Time">
           <template #body="slotProps">
             <audio ref="audioElement"></audio>
             <Button
@@ -101,19 +101,17 @@
       >
         <Column field="title" header="">
           <template #body="slotProps">
-            <img :src="slotProps.data.cover_sm" width="80" alt="" />
+            <img :src="slotProps.data.images" width="50" alt="" />
           </template>
         </Column>
-        <Column field="title" header="Title">
+        <Column field="name" header="Title">
           <template #body="slotProps">
-            {{ slotProps.data.title }}
+            {{ slotProps.data.name }}
           </template>
         </Column>
         <Column field="artist" header="Artist">
           <template #body="slotProps">
-            <div class="row">
-              <p>{{ slotProps.data.artist }}</p>
-            </div>
+            <p>{{ slotProps.data.artist }}</p>
           </template>
         </Column>
         <Column field="album" header="Album">
@@ -163,11 +161,7 @@
         >
           <Card style="width: 18em" class="">
             <template #header>
-              <img
-                alt="user header"
-                :src="song.album.images[0].url"
-                style="width: 100%"
-              />
+              <img alt="user header" :src="song.images" style="width: 100%" />
             </template>
             <template #subtitle>
               {{ song.album.name }}
@@ -216,12 +210,12 @@
   </Sidebar>
 </template>
 <script setup>
-import useDeezer from "@/services/useDeezer";
+import useSpotify from "@/services/useSpotify";
 import { onMounted, ref } from "vue";
 import { useMediaControls } from "@vueuse/core";
 import Play from "@/components/Music/Play.vue";
 
-const { search, getData, songs, getTrack, getTracks, cues } = useDeezer();
+const { search, getData, songs } = useSpotify();
 const audioElement = ref(null);
 const play = ref(true);
 const icon = ref("pi pi-play");
