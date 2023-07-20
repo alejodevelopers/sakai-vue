@@ -8,10 +8,14 @@ export const useUserStore = defineStore({
   state: () =>
     // Estado inicial que se recupera del almacenamiento local o utiliza valores predeterminados
     JSON.parse(localStorage.getItem('USER_INFO')) ?? {
-      id: null,
-      name: 'guest',
-      username: null,
-      email: null,
+      isLoggedIn: false,
+      token: null,
+      token_type: null,
+      user: {
+          id: null,
+          name: null,
+          email: null,
+      }
     },
 
   actions: {
@@ -27,7 +31,6 @@ export const useUserStore = defineStore({
     async storeInfo() {
       let { data: userInfo } = await api.get('/user')
       localStorage.setItem('USER_INFO', JSON.stringify(userInfo))
-      console.log(data);
       this.$reset()
     },
   },

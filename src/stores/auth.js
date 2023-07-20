@@ -4,16 +4,21 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user.js'
 import { useApi } from '@/api/useAPI'
 
-const web = useApi('web')
+const api = useApi('api')
 
 export const useAuthStore = defineStore({
   id: 'auth',
   state: () =>
     // Estado inicial que se recupera del almacenamiento local o utiliza valores predeterminados
     JSON.parse(localStorage.getItem('AUTH_STATE')) ?? {
-      email: null,
-      username: null,
       isLoggedIn: false,
+      token: null,
+      token_type: "Bearer",
+      user: {
+          id: null,
+          name: null,
+          email: null,
+      }
     },
 
   actions: {
@@ -29,12 +34,13 @@ export const useAuthStore = defineStore({
     async login({ email, password }) {
       const user = useUserStore()
       try {
-        await web.post('/login', { email, password })
+       const{data}= await api.post('/login', { email, password })
+       console.log(data);
         this.updateState({ email, isLoggedIn: true })
         await user.storeInfo()
       } catch (error) {
         console.log(error);
-        console.log('Error at login: ', error.message)
+       /*  console.log('Error at login: ', error.message) */
         throw error
       }
     },
@@ -43,7 +49,7 @@ export const useAuthStore = defineStore({
     async register(props) {
       const user = useUserStore()
       try {
-        await web.post('/register', props)
+        await api.post('/register', props)
         this.updateState({ email: props.email, isLoggedIn: true })
         await user.storeInfo()
       } catch (error) {
@@ -55,7 +61,7 @@ export const useAuthStore = defineStore({
     // Envía una solicitud para restablecer la contraseña
     async forgotPassword({ email }) {
       try {
-        await web.post('/forgot-password', { email })
+        await api.post('/forgot-password', { email })
       } catch (error) {
         console.log('ERROR WITH FORGOT-PASSWORD ENDPOINT: ', error.message)
         throw error
@@ -65,12 +71,12 @@ export const useAuthStore = defineStore({
     // Cierra sesión
     async logout() {
       const user = useUserStore()
-      const router = useRouter()
       localStorage.clear() // siempre limpiar localStorage antes de restablecer el estado
       this.$reset()
       user.$reset()
       try {
-        await web.post('/logout')
+        await api.post('/logout')
+        const router = useRouter()
         await router.push({ name: 'login' })
       } catch (error) {
         window.location.pathname = '/login'

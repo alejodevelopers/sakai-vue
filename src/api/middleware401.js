@@ -8,7 +8,7 @@ const middleware401 = async error => {
   const { status } = error.request;
 
   if (status === 401 || status === 419) {
-	console.log(error);
+
     const auth = useAuthStore();
 
     // Espera 3 segundos y luego cierra la sesión del usuario

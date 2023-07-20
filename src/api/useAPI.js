@@ -13,9 +13,9 @@ export const useApi = (endpoint = 'api') => {
   let baseURL
 
   if (endpoint === 'api') {
-    baseURL = API_HOST + API_PATH || 'http://localhost:8000/api'
+    baseURL = API_HOST + API_PATH || 'https://tidelit.co/api'
   } else if (endpoint === 'web') {
-    baseURL = API_HOST || 'http://localhost:8000'
+    baseURL = API_HOST || 'https://tidelit.co'
   }
 
   const axiosInstance = axios.create({
