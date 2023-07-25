@@ -111,7 +111,30 @@ const router = createRouter({
           path: "/music",
           name: "music",
           component: () => import("@/components/Music/Search.vue")
+        },
+        {
+          path: "/artists",
+          name: "artists",
+          component: () => import("@/views/music/artists/Index.vue")
+          /*  children: [
+            {
+              path: ":id",
+              component: () => import("@/views/music/artists/Show.vue"),
+            }
+          ] */
+        },
+        {
+          path: "/artist/:id/albums",
+          name: "artist",
+          component: () => import("@/views/music/artists/Show.vue"),
+         
+        },
+        {
+          path: "album/:id/tracks",
+          name: "album",
+          component: () => import("@/views/music/artists/Tracks.vue")
         }
+
         /* {
           path: "/uikit/message",
           name: "message",

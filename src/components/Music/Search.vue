@@ -30,10 +30,10 @@
         <span>All</span>
       </template>
       <h3 class="my-4 title-music">All</h3>
-      <DataTable :value="songs" >
-        <Column field="url" header="">
+      <DataTable :value="songs" tableStyle="min-width: 50rem">
+        <Column field="image_xs" header="Image">
           <template #body="slotProps">
-            <img :src="slotProps.data.images" width="" alt=""  />
+            <img :src="slotProps.data.image_xs"  alt=""  />
           </template>
         </Column>
         <Column field="name" header="Song">
@@ -57,7 +57,7 @@
           <template #body="slotProps">
             <audio ref="audioElement"></audio>
             <Button
-              v-if="slotProps.data.preview_url"
+              v-if="slotProps.data.preview"
               :class="play === true ? 'styPlay' : 'active'"
               :icon="icon"
               @click="changeSong(slotProps.data)"
@@ -92,57 +92,7 @@
         <span>Songs</span>
       </template>
       <h3 class="my-4 title-music">Songs</h3>
-      <DataTable
-        responsiveLayout="stack"
-        breakpoint="960px"
-        showGridlines
-        columnResizeMode="fit | expand"
-        :value="cues"
-      >
-        <Column field="title" header="">
-          <template #body="slotProps">
-            <img :src="slotProps.data.images" width="50" alt="" />
-          </template>
-        </Column>
-        <Column field="name" header="Title">
-          <template #body="slotProps">
-            {{ slotProps.data.name }}
-          </template>
-        </Column>
-        <Column field="artist" header="Artist">
-          <template #body="slotProps">
-            <p>{{ slotProps.data.artist }}</p>
-          </template>
-        </Column>
-        <Column field="album" header="Album">
-          <template #body="slotProps">
-            <p>{{ slotProps.data.album }}</p>
-          </template>
-        </Column>
-        <Column field="duration" header="">
-          <template #body="slotProps">
-            <audio ref="audioElement"></audio>
-            <Button
-              :class="play === true ? 'styPlay' : 'active'"
-              :icon="icon"
-              @click="playSong(slotProps.data)"
-              severity="secondary"
-              style="margin-left: 0.5em"
-            />
-          </template>
-        </Column>
-        <Column field="duration" header="Time">
-          <template #body="slotProps">
-            <p>{{ slotProps.data.durationText }}</p>
-            <!-- <iframe
-              scrolling="no"
-              frameborder="0"
-              allowTransparency="true"
-              :src="`https://www.deezer.com/plugins/player?format=square&autoplay=false&playlist=true&width=300&height=300&color=007FEB&layout=dark&size=medium&type=tracks&id=${slotProps.data.id}&app_id=1`"
-            ></iframe> -->
-          </template>
-        </Column>
-      </DataTable>
+      
     </TabPanel>
 
     <TabPanel>
@@ -198,7 +148,7 @@
     </TabPanel>
   </TabView>
 
-  <Sidebar
+  <!-- <Sidebar
     v-model:visible="visibleBottom"
     position="bottom"
     class="w-full"
@@ -207,13 +157,14 @@
     <div class="flex overflow-hidden">
       <play></play>
     </div>
-  </Sidebar>
+  </Sidebar> -->
 </template>
 <script setup>
 import useSpotify from "@/services/useSpotify";
 import { onMounted, ref } from "vue";
 import { useMediaControls } from "@vueuse/core";
 import Play from "@/components/Music/Play.vue";
+import MusicPlayer from "./MusicPlayer.vue";
 
 const { search, getData, songs } = useSpotify();
 const audioElement = ref(null);
@@ -247,11 +198,11 @@ const responsiveOptions = ref([
 
 const forward = () => {
   forwardBtn.value++;
-  console.log(forwardBtn.value);
+
 };
 const backward = () => {
   forwardBtn.value--;
-  console.log(forwardBtn.value);
+
 };
 
 const visible = (event) => {
@@ -275,7 +226,7 @@ const changeSong = (e) => {
 
   // Cambiar el src de la etiqueta de audio y reproducir la nueva canción
   if (audio) {
-    audio.src = selectedSong.preview_url;
+    audio.src = selectedSong.preview;
     audio.load(); // Cargar la nueva canción
     audio.play(); // Reproducir la nueva canción
   }

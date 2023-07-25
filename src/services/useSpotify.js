@@ -13,7 +13,6 @@ const useSpotify = () => {
       });
       if (res) {
         songs.value = res.data.tracks;
-        console.log(songs.value);
       
       }
     } catch (error) {
