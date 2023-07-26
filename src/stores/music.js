@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-
 export const useMusicStore = defineStore({
   id: "music",
   state: () => ({
@@ -12,20 +11,15 @@ export const useMusicStore = defineStore({
     volume: 50, // Volumen de reproducción (0 a 100)
     repeatTrack: false, // Repetir la pista actual (activado o no)
     repeatPlaylist: false, // Repetir toda la lista de reproducción (activado o no)
-    shuffle: false // Reproducción aleatoria (activado o no)
+    shuffle: false, // Reproducción aleatoria (activado o no)
+    muted: false
   }),
 
   actions: {
-    playAudio(audioSrc) {
-      const { audio, toggle } = useMediaControls(audioSrc);
-      toggle();
-    },
-
     playPlaylist(playlist) {
       this.currentPlaylist = playlist;
       this.currentTrackIndex = 0;
       this.track = this.currentPlaylist[this.currentTrackIndex];
-      this.playAudio(this.track.preview_url);
       this.play = true;
     },
 
@@ -53,10 +47,11 @@ export const useMusicStore = defineStore({
         this.play = true;
       }
     },
-
     playNext() {
       if (this.repeatTrack) {
         this.playCurrentTrack();
+      } else if (this.shuffle) {
+        this.playRandomTrack();
       } else {
         const newIndex = this.currentTrackIndex + 1;
         if (newIndex < this.currentPlaylist.length) {
@@ -75,6 +70,8 @@ export const useMusicStore = defineStore({
     playPrevious() {
       if (this.repeatTrack) {
         this.playCurrentTrack();
+      } else if (this.shuffle) {
+        this.playRandomTrack();
       } else {
         const newIndex = this.currentTrackIndex - 1;
         if (newIndex >= 0) {
@@ -88,6 +85,14 @@ export const useMusicStore = defineStore({
         }
       }
       this.play = true;
+    },
+
+    playRandomTrack() {
+      const randomIndex = Math.floor(
+        Math.random() * this.currentPlaylist.length
+      );
+      this.currentTrackIndex = randomIndex;
+      this.track = this.currentPlaylist[this.currentTrackIndex];
     },
 
     playCurrentTrack() {

@@ -10,11 +10,8 @@
           <div class="music-player-info">
             <!-- Información de la canción actual -->
             <span class="music-player-song-title">
-              {{ currentTrack.name }}</span
+              {{ currentTrack.name }} - {{ currentTrack.artist_name }}</span
             >
-            <span class="music-player-artist">{{
-              currentTrack.artist_name
-            }}</span>
           </div>
         </div>
         <div class="music-player-controls">
@@ -29,7 +26,7 @@
           />
           <MusicPlayerButton :icon="'pi pi-step-forward'" @onClick="playNext" />
           <MusicPlayerButton
-            :icon="muted ? 'pi pi-volume-off' : 'pi pi-volume-up'"
+            :icon="mute ? 'pi pi-volume-off' : 'pi pi-volume-up'"
             @onClick="toggleMute"
           />
           <MusicPlayerButton
@@ -87,14 +84,13 @@ import MusicPlayerButton from "@/components/music/MusicPlayerButton.vue";
 import { useMediaControls } from "@vueuse/core";
 import Slider from "primevue/slider";
 
-
 const musicStore = useMusicStore();
 const audioElement = ref(null);
-const { playing, currentTime, duration, volume, tracks, enableTrack } =
-  useMediaControls(audioElement);
-/* const playing = computed(() => musicStore.play); */
+const { muted } = useMediaControls(audioElement);
+
+const playing = computed(() => musicStore.play);
 const currentTrack = computed(() => musicStore.track);
-const muted = computed(() => musicStore.muted);
+const mute = computed(() => (muted.value = musicStore.muted));
 const random = computed(() => musicStore.random);
 const repeat = computed(() => musicStore.repeat);
 /* const currentTime = ref("0:00");
@@ -105,7 +101,6 @@ let showTimeTooltip = false;
 
 const togglePlayPause = () => {
   musicStore.togglePlayPause();
-  /* musicStore.playAudio(audioElement); */
 };
 
 const playPrevious = () => {
@@ -150,7 +145,24 @@ const formatTime = (timeInMs) => {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 };
 watchEffect(() => {
-  console.log(audioElement);
+  if (audioElement.value) {
+    const audio = audioElement.value;
+
+    // Cuando cambie la pista actual, actualizamos la fuente del audio
+    audio.src = musicStore.track.preview_url;
+    audio.load();
+
+    // Establecemos el evento 'ended' para avanzar a la siguiente pista cuando la actual haya terminado
+    audio.addEventListener("ended", () => {
+      musicStore.playNext(); // Utiliza la acción playNext() del store para avanzar a la siguiente pista
+    });
+
+    if (musicStore.play) {
+      audio.play();
+    } else {
+      audio.pause();
+    }
+  }
 });
 </script>
 <style scoped>
