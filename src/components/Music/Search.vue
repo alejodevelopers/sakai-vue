@@ -33,7 +33,7 @@
       <DataTable :value="songs" tableStyle="min-width: 50rem">
         <Column field="image_xs" header="Image">
           <template #body="slotProps">
-            <img :src="slotProps.data.image_xs"  alt=""  />
+            <img :src="slotProps.data.image_xs" alt="" />
           </template>
         </Column>
         <Column field="name" header="Song">
@@ -92,7 +92,6 @@
         <span>Songs</span>
       </template>
       <h3 class="my-4 title-music">Songs</h3>
-      
     </TabPanel>
 
     <TabPanel>
@@ -163,8 +162,6 @@
 import useSpotify from "@/services/useSpotify";
 import { onMounted, ref } from "vue";
 import { useMediaControls } from "@vueuse/core";
-import Play from "@/components/Music/Play.vue";
-import MusicPlayer from "./MusicPlayer.vue";
 
 const { search, getData, songs } = useSpotify();
 const audioElement = ref(null);
@@ -198,11 +195,9 @@ const responsiveOptions = ref([
 
 const forward = () => {
   forwardBtn.value++;
-
 };
 const backward = () => {
   forwardBtn.value--;
-
 };
 
 const visible = (event) => {
@@ -222,16 +217,16 @@ const { playing, currentTime, duration, volume, tracks, enableTrack } =
 const changeSong = (e) => {
   const selectedSong = e;
   visibleBottom.value = true;
+
   const audio = audioElement.value;
 
   // Cambiar el src de la etiqueta de audio y reproducir la nueva canción
   if (audio) {
     audio.src = selectedSong.preview;
     audio.load(); // Cargar la nueva canción
+    console.log(audio.play());
     audio.play(); // Reproducir la nueva canción
   }
-  getTracks();
-
   // Habilitar la pista de texto correspondiente si es necesario
   //enableTrack(selectedSong.preview_url);
 };

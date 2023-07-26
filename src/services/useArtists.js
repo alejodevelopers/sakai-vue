@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { useApi } from "@/api/useAPI.js";
 const api = useApi();
+
 const useArtists = () => {
   const artists = ref([]);
   const artist = ref({});

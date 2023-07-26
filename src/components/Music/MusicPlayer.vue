@@ -1,95 +1,131 @@
 <template>
-  <div class="music-player-footer">
-    <div class="music-player-container">
-      <div class="music-player-content">
-        <div class="music-player-album-art">
-          <!-- Icono del álbum de la canción actual -->
-          <img src="https://i.scdn.co/image/ab67616d0000b273c86d01b827c542a230d609cf" alt="Album Art" />
+  <div class="music-player">
+    <div class="music-player-footer">
+      <div class="music-player-container">
+        <div class="music-player-content">
+          <div class="music-player-album-art">
+            <!-- Icono del álbum de la canción actual -->
+            <img :src="currentTrack.image_sm" :alt="currentTrack.name" />
+          </div>
+          <div class="music-player-info">
+            <!-- Información de la canción actual -->
+            <span class="music-player-song-title">
+              {{ currentTrack.name }}</span
+            >
+            <span class="music-player-artist">{{
+              currentTrack.artist_name
+            }}</span>
+          </div>
         </div>
-        <div class="music-player-info">
-          <!-- Información de la canción actual -->
-          <span class="music-player-song-title">Nombre de la canción</span>
-          <span class="music-player-artist">Artista</span>
-        </div>
-      </div>
-      <div class="music-player-controls">
-        <!-- Controles del reproductor -->
-        <button class="p-button p-button-outlined" @click="previous">
-          <i class="pi pi-step-backward"></i>
-        </button>
-        <button class="p-button p-button-outlined" @click="playPause">
-          <i :class="playing ? 'pi pi-pause' : 'pi pi-play'"></i>
-        </button>
-        <button class="p-button p-button-outlined" @click="next">
-          <i class="pi pi-step-forward"></i>
-        </button>
-        <button class="p-button p-button-outlined" @click="toggleVolume">
-          <i :class="muted ? 'pi pi-volume-off' : 'pi pi-volume-up'"></i>
-        </button>
-        <button class="p-button p-button-outlined" @click="toggleRandom">
-          <i :class="random ? 'pi pi-random' : 'pi pi-sort-alt'"></i>
-        </button>
-        <button class="p-button p-button-outlined" @click="toggleRepeat">
-          <i :class="repeat ? 'pi pi-repeat' : 'pi pi-refresh'"></i>
-        </button>
-        <button class="p-button p-button-outlined" @click="openAudioSettings">
-          <i class="pi pi-cog"></i>
-        </button>
-        <div class="music-player-progress">
-          <!-- Barra de progreso del reproductor -->
-          <span class="music-player-current-time">{{ currentTime }}</span>
-          <Slider
-            class="mx-2"
-            :value="progress"
-            mode="horizontal"
-            :max="100"
-            @input="onSliderInput"
-            :style="{ width: '50%' }"
+        <div class="music-player-controls">
+          <!-- Controles del reproductor -->
+          <MusicPlayerButton
+            :icon="'pi pi-step-backward'"
+            @onClick="playPrevious"
           />
-          <span class="music-player-duration">{{ duration }}</span>
+          <MusicPlayerButton
+            :icon="playing ? 'pi pi-pause' : 'pi pi-play'"
+            @onClick="togglePlayPause"
+          />
+          <MusicPlayerButton :icon="'pi pi-step-forward'" @onClick="playNext" />
+          <MusicPlayerButton
+            :icon="muted ? 'pi pi-volume-off' : 'pi pi-volume-up'"
+            @onClick="toggleMute"
+          />
+          <MusicPlayerButton
+            :icon="random ? 'pi pi-random' : 'pi pi-sort-alt'"
+            @onClick="toggleRandom"
+          />
+          <MusicPlayerButton
+            :icon="repeat ? 'pi pi-repeat' : 'pi pi-refresh'"
+            @onClick="toggleRepeat"
+          />
+          <MusicPlayerButton :icon="'pi pi-cog'" @onClick="openAudioSettings" />
+
+          <div class="music-player-progress">
+            <!-- Barra de progreso del reproductor -->
+            <span
+              class="music-player-current-time"
+              @mouseenter="showTimeTooltip = true"
+              @mouseleave="showTimeTooltip = false"
+            >
+              {{ currentTime }}
+            </span>
+            <Slider
+              class="mx-2"
+              :value="progress"
+              mode="horizontal"
+              :max="100"
+              @input="onSliderInput"
+              :style="{ width: '50%' }"
+              @mouseenter="showTimeTooltip = true"
+              @mouseleave="showTimeTooltip = false"
+            />
+            <span
+              class="music-player-duration"
+              @mouseenter="showTimeTooltip = true"
+              @mouseleave="showTimeTooltip = false"
+            >
+              {{ duration }}
+            </span>
+            <div class="music-player-time-tooltip" v-if="showTimeTooltip">
+              {{ formatTime((progress * totalDurationInMs) / 100) }} /
+              {{ formatTime(totalDurationInMs) }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  <audio ref="audioElement" />
 </template>
-  
-  <script setup>
-import { ref } from "vue";
 
-const playing = ref(false);
-const currentTime = ref("0:00");
-const duration = ref("3:30"); // Duración de la canción en formato "minutos:segundos"
+<script setup>
+import { ref, computed, watchEffect } from "vue";
+import { useMusicStore } from "@/stores/music";
+import MusicPlayerButton from "@/components/music/MusicPlayerButton.vue";
+import { useMediaControls } from "@vueuse/core";
+import Slider from "primevue/slider";
+
+
+const musicStore = useMusicStore();
+const audioElement = ref(null);
+const { playing, currentTime, duration, volume, tracks, enableTrack } =
+  useMediaControls(audioElement);
+/* const playing = computed(() => musicStore.play); */
+const currentTrack = computed(() => musicStore.track);
+const muted = computed(() => musicStore.muted);
+const random = computed(() => musicStore.random);
+const repeat = computed(() => musicStore.repeat);
+/* const currentTime = ref("0:00");
+const duration = ref("3:30");  */ // Duración de la canción en formato "minutos:segundos"
 const progress = ref(100); // Valor de la barra de progreso (0 a 100)
-const muted = ref(false); // Estado del volumen (silenciado o no)
-const random = ref(false); // Estado de reproducción aleatoria (activada o no)
-const repeat = ref(false); // Estado de repetir canciones (activado o no)
+const totalDurationInMs = 1000 * 3 * 60 + 1000 * 30; // Ejemplo de duración total en milisegundos
+let showTimeTooltip = false;
 
-const playPause = () => {
-  playing.value = !playing.value;
-  // Lógica para reproducir o pausar la canción
+const togglePlayPause = () => {
+  musicStore.togglePlayPause();
+  /* musicStore.playAudio(audioElement); */
 };
 
-const previous = () => {
-  // Lógica para reproducir la canción anterior
+const playPrevious = () => {
+  musicStore.playPrevious();
 };
 
-const next = () => {
-  // Lógica para reproducir la siguiente canción
+const playNext = () => {
+  musicStore.playNext();
 };
 
-const toggleVolume = () => {
-  muted.value = !muted.value;
-  // Lógica para ajustar el volumen (silenciar o reanudar el audio)
+const toggleMute = () => {
+  musicStore.toggleMute();
 };
 
 const toggleRandom = () => {
-  random.value = !random.value;
-  // Lógica para activar o desactivar la reproducción aleatoria
+  musicStore.toggleRandom();
 };
 
 const toggleRepeat = () => {
-  repeat.value = !repeat.value;
-  // Lógica para activar o desactivar la repetición de canciones
+  musicStore.toggleRepeat();
 };
 
 const openAudioSettings = () => {
@@ -100,27 +136,42 @@ const onSliderInput = (event) => {
   // Lógica para actualizar el progreso de reproducción cuando el usuario ajusta el slider
   progress.value = event.value;
 };
+
+const updateCurrentTime = () => {
+  // Lógica para actualizar el tiempo actual de reproducción del audio
+  const currentTimeInSeconds = audioElement.value.currentTime;
+  currentTime.value = formatTime(currentTimeInSeconds * 1000);
+};
+
+const formatTime = (timeInMs) => {
+  // Lógica para formatear el tiempo en milisegundos a "minutos:segundos"
+  const minutes = Math.floor(timeInMs / 60000);
+  const seconds = Math.floor((timeInMs % 60000) / 1000);
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
+watchEffect(() => {
+  console.log(audioElement);
+});
 </script>
-  
-  <style scoped>
-.music-player-footer {
+<style scoped>
+.music-player {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 7rem; /* Altura de 13 rem */
+  height: 7rem; /* Altura del reproductor */
   padding: 15px;
-  background-color: var(--surface-overlay);
-  color: var(--surface-900);
+  background-color: var(--surface-overlay); /* Color de fondo del reproductor */
+  color: var(--surface-900); /* Color de texto del reproductor */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999; /* Valor alto para que se superponga sobre el contenido */
 }
 
-.music-player-container {
+.music-player-footer {
   width: 100%;
-  max-width: 800px;
+  max-width: 800px; /* Ancho máximo del reproductor */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -130,6 +181,16 @@ const onSliderInput = (event) => {
   display: flex;
   align-items: center;
   flex: 1;
+}
+
+.music-player-album-art {
+  margin-right: 10px; /* Espaciado entre el área del álbum y la información de la canción */
+}
+
+.music-player-album-art img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%; /* Para dar forma circular a la imagen del álbum */
 }
 
 .music-player-info {
@@ -146,33 +207,35 @@ const onSliderInput = (event) => {
   align-items: center;
 }
 
-.music-player-album-art img {
-  width: 60px;
-  height: 60px;
+.music-player-current-time,
+.music-player-duration {
+  margin: 0 5px; /* Espaciado entre el tiempo actual y la duración total de la canción */
 }
 
-.music-player-song-title {
-  font-size: 1rem;
-  font-weight: bold;
+.music-player-time-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #000;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.music-player-artist {
-  font-size: 0.9rem;
-}
-
-.p-button-outlined {
-  background-color: transparent;
-  color:  var(--surface-900);;
-  border-color: #fff;
-}
-
-.p-progressbar-value {
-  background-color: #ff4d4f;
+.music-player-progress:hover .music-player-time-tooltip {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Estilos responsivos */
 @media screen and (max-width: 600px) {
-  .music-player-container {
+  .music-player-footer {
     flex-direction: column;
     align-items: center;
   }
@@ -183,4 +246,3 @@ const onSliderInput = (event) => {
   }
 }
 </style>
-  

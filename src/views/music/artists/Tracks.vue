@@ -1,18 +1,22 @@
-
 <template>
   <div class="text-center mb-4">
     <img :src="album.image_md" class="avatar_album" :alt="album.name" />
     <Divider />
     <div class="p-badge">Album</div>
-    <div class="text-2xl font-bold mb-1 text-center">
+    <div class="text-2xl font-bold mb-1">
       {{ album.name }}
     </div>
-    <div class="text-xl font-normal text-center">
-      Total Tracks: {{ tracksAlbum.length }}
+    <div class="text-xl font-normal">
+      {{ tracksAlbum.length }} songs - {{ getFormattedTotalDuration() }}
     </div>
-    <div class="text-lg text-center">
-      Release date: {{ album.release_date }}
-    </div>
+    <div class="text-lg mb-3">Release date: {{ album.release_date }}</div>
+    <Button
+      icon="pi pi-play"
+      size="large"
+      rounded
+      label="LISTEN"
+      @click="playPlaylist(tracksAlbum)"
+    />
   </div>
   <DataTable
     responsiveLayout="stack"
@@ -45,7 +49,6 @@
     </Column>
     <Column field="duration_ms" header="Time">
       <template #body="slotProps">
-        <audio ref="audioElement"></audio>
         <Button
           v-if="slotProps.data.preview_url"
           :class="play === true ? 'styPlay' : 'active'"
@@ -54,23 +57,24 @@
           severity="secondary"
           style="margin-left: 0.5em"
         />
-       
       </template>
     </Column>
   </DataTable>
-  {{ albumId }}
 </template>
-    
-    <script setup>
+
+<script setup>
 import useArtists from "@/services/useArtists";
 import { useRoute } from "vue-router";
+import { useMusicStore } from "../../../stores/music";
+const { playPlaylist } = useMusicStore();
+import MusicPlayerButton from "@/components/Music/MusicPlayerButton.vue";
 import { onMounted, watchEffect, ref } from "vue";
 const { getAlbumTracks, tracksAlbum, album } = useArtists();
 const route = useRoute();
 const albumId = ref(route.params.id);
 const icon = ref("pi pi-play");
 import { useMediaControls } from "@vueuse/core";
-const visibleBottom =ref(false);
+const visibleBottom = ref(false);
 onMounted(() => {
   getAlbumTracks(albumId.value);
 });
@@ -79,6 +83,28 @@ const convertToMinutesAndSeconds = (durationInMs) => {
   const seconds = Math.floor((durationInMs % 60000) / 1000);
 
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
+const getTotalDuration = () => {
+  return tracksAlbum.value.reduce(
+    (total, track) => total + track.duration_ms,
+    0
+  );
+};
+
+// Acción para obtener el tiempo total en un formato más legible (minutos y segundos)
+const getFormattedTotalDuration = () => {
+  const totalDurationInMs = getTotalDuration();
+  const totalSeconds = Math.floor(totalDurationInMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  // Agregar ceros iniciales si es necesario
+  const formattedHours = String(hours).padStart(2);
+  const formattedMinutes = String(minutes).padStart(2, "0");
+  const formattedSeconds = String(seconds).padStart(2, "0");
+
+  return `${formattedHours} h. ${formattedMinutes} minutes`;
 };
 const audioElement = ref(null);
 const play = ref(true);
